@@ -45,12 +45,20 @@ namespace Rocky.Controllers
                 shoppingCartList = HttpContext.Session.Get<List<ShoppingCart>>(WC.SessionCart);
             }
 
-            DetailsVM homeVm = new DetailsVM()
+
+            DetailsVM detailsVm = new DetailsVM()
             {
                 Product = _db.Product.Include(u => u.Category).Include(u => u.ApplicationType).Where(u => u.Id == id).FirstOrDefault(),
                 ExistsInCart = false
             };
-            return View(homeVm);
+
+            foreach (var item in shoppingCartList)
+            {
+                if (item.ProductId == id)
+                    detailsVm.ExistsInCart = true;
+            }
+
+            return View(detailsVm);
         }
 
         [HttpPost, ActionName("Details")]
@@ -65,10 +73,25 @@ namespace Rocky.Controllers
            
             shoppingCarts.Add(new ShoppingCart { ProductId = id });
             HttpContext.Session.Set(WC.SessionCart, shoppingCarts);
-            var s = HttpContext.Session.Get<IEnumerable<ShoppingCart>>(WC.SessionCart); //session has added key
             return RedirectToAction(nameof(Index));
         }
 
+        public IActionResult RemoveFromCart(int id)
+        {
+            List<ShoppingCart> shoppingCarts = new List<ShoppingCart>();
+            if (HttpContext.Session.Get<IEnumerable<ShoppingCart>>(WC.SessionCart) != null
+                && HttpContext.Session.Get<IEnumerable<ShoppingCart>>(WC.SessionCart).Count() > 0)
+            {
+                shoppingCarts = HttpContext.Session.Get<List<ShoppingCart>>(WC.SessionCart);
+            }
+
+            var itemToRemove = shoppingCarts.FirstOrDefault(it => it.ProductId == id);
+            if (itemToRemove != null)
+                shoppingCarts.Remove(itemToRemove);
+
+            HttpContext.Session.Set(WC.SessionCart, shoppingCarts);
+            return RedirectToAction(nameof(Index));
+        }
 
         public IActionResult Privacy()
         {
