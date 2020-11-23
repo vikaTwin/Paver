@@ -1,0 +1,4 @@
+E:\git_repo\Rocky\Rocky_Utility\obj\Debug\netcoreapp3.1\Rocky_Utility.csprojAssemblyReference.cache
+E:\git_repo\Rocky\Rocky_Utility\obj\Debug\netcoreapp3.1\Rocky_Utility.AssemblyInfoInputs.cache
+E:\git_repo\Rocky\Rocky_Utility\obj\Debug\netcoreapp3.1\Rocky_Utility.AssemblyInfo.cs
+E:\git_repo\Rocky\Rocky_Utility\obj\Debug\netcoreapp3.1\Rocky_Utility.csproj.CoreCompileInputs.cache

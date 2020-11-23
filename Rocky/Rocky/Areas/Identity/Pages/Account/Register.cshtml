@@ -1,6 +1,7 @@
 ﻿@page
 @model RegisterModel
- @if (User.IsInRole(Rocky.WC.AdminRole))
+@using Rocky_Utility
+ @if (User.IsInRole(WC.AdminRole))
  {
      <h1>Register an Admin User</h1>
  }
@@ -40,7 +41,7 @@
                 <input asp-for="Input.ConfirmPassword" class="form-control" />
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            @if (User.IsInRole(Rocky.WC.AdminRole))
+            @if (User.IsInRole(WC.AdminRole))
             {
                 <button type="submit" class="btn btn-warning">Register an Admin user</button>
             }

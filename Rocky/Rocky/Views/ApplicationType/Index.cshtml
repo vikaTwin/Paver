@@ -1,6 +1,6 @@
-﻿@model IEnumerable<Rocky.Models.ApplicationType>
+﻿@model IEnumerable<Rocky_Models.ApplicationType>
 
-<div class="container p-3">
+<div class="container p-3 bg-white">
     <div class="row pt-4">
         <div class="col-6">
             <h2 class="text-primary">Application Type List</h2>
@@ -25,7 +25,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var obj in Model)
+                @foreach(var obj in Model)
                 {
                     <tr>
                         <td width="50%">@obj.Name</td>

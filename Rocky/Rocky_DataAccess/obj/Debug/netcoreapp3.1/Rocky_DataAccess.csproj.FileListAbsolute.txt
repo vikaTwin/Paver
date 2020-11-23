@@ -1,0 +1,12 @@
+E:\git_repo\Rocky\Rocky_DataAccess\obj\Debug\netcoreapp3.1\Rocky_DataAccess.csprojAssemblyReference.cache
+E:\git_repo\Rocky\Rocky_DataAccess\obj\Debug\netcoreapp3.1\Rocky_DataAccess.AssemblyInfoInputs.cache
+E:\git_repo\Rocky\Rocky_DataAccess\obj\Debug\netcoreapp3.1\Rocky_DataAccess.AssemblyInfo.cs
+E:\git_repo\Rocky\Rocky_DataAccess\obj\Debug\netcoreapp3.1\Rocky_DataAccess.csproj.CoreCompileInputs.cache
+E:\git_repo\Rocky\Rocky_DataAccess\bin\Debug\netcoreapp3.1\Rocky_DataAccess.deps.json
+E:\git_repo\Rocky\Rocky_DataAccess\bin\Debug\netcoreapp3.1\Rocky_DataAccess.dll
+E:\git_repo\Rocky\Rocky_DataAccess\bin\Debug\netcoreapp3.1\Rocky_DataAccess.pdb
+E:\git_repo\Rocky\Rocky_DataAccess\bin\Debug\netcoreapp3.1\Rocky_Models.dll
+E:\git_repo\Rocky\Rocky_DataAccess\bin\Debug\netcoreapp3.1\Rocky_Models.pdb
+E:\git_repo\Rocky\Rocky_DataAccess\obj\Debug\netcoreapp3.1\Rocky_DataAccess.csproj.CopyComplete
+E:\git_repo\Rocky\Rocky_DataAccess\obj\Debug\netcoreapp3.1\Rocky_DataAccess.dll
+E:\git_repo\Rocky\Rocky_DataAccess\obj\Debug\netcoreapp3.1\Rocky_DataAccess.pdb

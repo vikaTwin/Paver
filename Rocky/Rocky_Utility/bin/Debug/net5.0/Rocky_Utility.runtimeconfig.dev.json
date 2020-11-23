@@ -1,0 +1,8 @@
+{
+  "runtimeOptions": {
+    "additionalProbingPaths": [
+      "C:\\Users\\gamar\\.dotnet\\store\\|arch|\\|tfm|",
+      "C:\\Users\\gamar\\.nuget\\packages"
+    ]
+  }
+}
