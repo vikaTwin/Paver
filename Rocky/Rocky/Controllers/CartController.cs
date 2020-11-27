@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Braintree;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Rocky_DataAccess;
@@ -7,6 +9,7 @@ using Rocky_DataAccess.Repository.IRepository;
 using Rocky_Models;
 using Rocky_Models.ViewModels;
 using Rocky_Utility;
+using Rocky_Utility.BrainTree;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,21 +23,23 @@ namespace Rocky.Controllers
     [Authorize]
     public class CartController : Controller
     {
-        public readonly IWebHostEnvironment _webHostEnvironment;
-        public readonly IEmailSender _emailSender;
-        public readonly IProductRepository _prodRepo;
-        public readonly IApplicationUserRepository _appUserRepo;
-        public readonly IInquiryHeaderRepository _inqHRepo;
-        public readonly IInquiryDetailsRepository _inqDRepo;
-        public readonly IOrderHeaderRepository _orderHRepo;
-        public readonly IOrderDetailsRepository _orderDRepo;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IEmailSender _emailSender;
+        private readonly IProductRepository _prodRepo;
+        private readonly IApplicationUserRepository _appUserRepo;
+        private readonly IInquiryHeaderRepository _inqHRepo;
+        private readonly IInquiryDetailsRepository _inqDRepo;
+        private readonly IOrderHeaderRepository _orderHRepo;
+        private readonly IOrderDetailsRepository _orderDRepo;
+        private readonly IBrainTreeGate _brain;
 
         [BindProperty]
         public ProductUserVM ProductUserVM { get; set; }
         public CartController(IWebHostEnvironment webHostEnvironment, IEmailSender emailSender, 
             IProductRepository prodRepo, IApplicationUserRepository appUserRepo,
             IInquiryHeaderRepository inqHRepo, IInquiryDetailsRepository inqDRepo,
-            IOrderHeaderRepository orderHRepo, IOrderDetailsRepository orderDRepo)
+            IOrderHeaderRepository orderHRepo, IOrderDetailsRepository orderDRepo,
+            IBrainTreeGate brain)
         {
             _prodRepo = prodRepo;
             _appUserRepo = appUserRepo;
@@ -44,6 +49,7 @@ namespace Rocky.Controllers
             _orderDRepo = orderDRepo;
             _webHostEnvironment = webHostEnvironment;
             _emailSender = emailSender;
+            _brain = brain;
         }
         public IActionResult Index()
         {
@@ -98,6 +104,9 @@ namespace Rocky.Controllers
                 {
                     appUser = new ApplicationUser();
                 }
+                var gateway = _brain.GetGateway();
+                var clientTocken = gateway.ClientToken.Generate();
+                ViewBag.ClientToken = clientTocken;
             }
             else
             {
@@ -133,18 +142,18 @@ namespace Rocky.Controllers
 
         [HttpPost, ActionName("Summary")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SummaryPost(ProductUserVM productUserVm)
+        public async Task<IActionResult> SummaryPost(IFormCollection collection, ProductUserVM productUserVm)
         {
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            
+
             if (User.IsInRole(WC.AdminRole))
             {
-               /* var orderTotal = 0.0;
-                foreach (var prod in productUserVm.ProductList)
-                {
-                    orderTotal += prod.Price * prod.TempSqFt;
-                }*/
+                /* var orderTotal = 0.0;
+                 foreach (var prod in productUserVm.ProductList)
+                 {
+                     orderTotal += prod.Price * prod.TempSqFt;
+                 }*/
                 OrderHeader orderHeader = new OrderHeader()
                 {
                     CreatedByUserId = claim.Value,
@@ -174,6 +183,30 @@ namespace Rocky.Controllers
                     _orderDRepo.Add(orderDetail);
                 }
                 _orderDRepo.Save();
+
+                string nonceFromTheClient = collection["payment_method_nonce"];
+                var request = new TransactionRequest
+                {
+                    Amount = Convert.ToDecimal(orderHeader.FinalOrderTotal),
+                    PaymentMethodNonce = nonceFromTheClient,
+                    OrderId = orderHeader.Id.ToString(),
+                    Options = new TransactionOptionsRequest
+                    {
+                        SubmitForSettlement = true
+                    }
+                };
+                var gateway = _brain.GetGateway();
+                Result<Transaction> result = gateway.Transaction.Sale(request);
+                if (result.Target.ProcessorResponseText == "Approved")
+                {
+                    orderHeader.TransactionId = result.Target.Id;
+                    orderHeader.OrderStatus = WC.StatusApproved;
+                }
+                else
+                {
+                    orderHeader.OrderStatus = WC.StatusCancelled;
+                }
+                _orderHRepo.Save();
                 return RedirectToAction(nameof(InquiryConfirmation), new { id = orderHeader.Id} );
             }
             else
@@ -249,6 +282,12 @@ namespace Rocky.Controllers
             HttpContext.Session.Set(WC.SessionCart, shoppingCartList);
                 
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Clear(int id)
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
