@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,5 +26,11 @@ namespace Rocky_Utility
         public const string StatusShipped = "Shipped";
         public const string StatusCancelled = "Cancelled";
         public const string StatusRefunded = "Refunded";
+
+        public static readonly IEnumerable<string> listStatus = new ReadOnlyCollection<string>(
+            new List<string>
+            {
+                StatusApproved, StatusCancelled, StatusInProcess, StatusPending, StatusRefunded, StatusShipped
+            });
     }
 }

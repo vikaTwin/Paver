@@ -127,7 +127,8 @@ namespace Rocky.Areas.Identity.Pages.Account
                         }
                         else
                         {
-                            return RedirectToAction("Index");
+                            TempData[WC.Success] = user.FullName + " has been registered";
+                            return RedirectToAction("Index", "Home");
                         }
                         return LocalRedirect(returnUrl);
                     }
